@@ -1,6 +1,6 @@
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, msg, program::invoke, program_error::ProgramError, program_pack::{Pack, IsInitialized}, pubkey::Pubkey, sysvar::{rent::Rent, Sysvar}};
 
-use crate::instruction::EscrowInstruction;
+use crate::instruction::{error::EscrowError, instruction::EscrowInstruction, state::Escrow};
 
 pub struct Processor;
 impl Processor {
@@ -62,6 +62,7 @@ impl Processor {
         let token_program = next_account_info(account_info_iter)?;
         //set_authority is builder function to create instruction to transfer ownership
         let owner_change_ix = spl_token::instruction::set_authority(
+            //Add a check here that the token program is really the account of the token program
             token_program.key,
             temp_token_account.key,
             Some(&pda),
@@ -73,6 +74,8 @@ impl Processor {
         msg!("Calling the token program to transfer token account ownership...");
         //Include signed initalizer account here for CPI, the signature is extended to CPI
         invoke(
+            //Because party A signed the InitEscrow transaction, program can make the token program set_authority CPI
+            //and include her pubkey as a signer pubkey
             &owner_change_ix,
             &[
                 temp_token_account.clone(),
