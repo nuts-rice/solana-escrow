@@ -1,6 +1,7 @@
 use solana_program::{account_info::{AccountInfo, next_account_info}, entrypoint::ProgramResult, msg, program::invoke, program_error::ProgramError, program_pack::{Pack, IsInitialized}, pubkey::Pubkey, sysvar::{rent::Rent, Sysvar}};
+use spl_token::state::Account as TokenAccount;
 
-use crate::instruction::{error::EscrowError, instruction::EscrowInstruction, state::Escrow};
+use crate::{error::EscrowError, instruction::EscrowInstruction, state::Escrow};
 
 pub struct Processor;
 impl Processor {
@@ -68,7 +69,7 @@ impl Processor {
             Some(&pda),
             spl_token::instruction::AuthorityType::AccountOwner,
             initializer.key,
-            &[&initalizer.key]
+            &[&initializer.key]
         )?;
 
         msg!("Calling the token program to transfer token account ownership...");

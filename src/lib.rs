@@ -1,23 +1,10 @@
-pub mod entrypoint;
 pub mod instruction;
 pub mod error;
 pub mod processor;
 pub mod state;
 
-entrypoint!(process_instruction);
-fn process_instruction(
-    program_id: &Pubkey,
-    accounts: &[AccountInfo],
-    instruction_data: &[u8],
-) -> ProgramResult {
-    msg!(
-        "process_instruction: {}: {} accounts, data={:?}",
-        program_id,
-        accounts.len(),
-        instruction_data
-    );
-    Ok(())
-}
+#[cfg(not(feature = "no-entrypoint"))]
+pub mod entrypoint;
 /*
 #[cfg(test)]
 mod test {
